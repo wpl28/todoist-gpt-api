@@ -10,7 +10,21 @@ load_dotenv()
 TODOIST_API_TOKEN = os.getenv("TODOIST_API_TOKEN")
 TODOIST_API_URL = "https://api.todoist.com/api/v1"
 
-app = FastAPI(title="Witek Todoist GPT API")
+app = FastAPI(
+
+    title="Witek Todoist GPT API",
+
+    servers=[
+
+        {
+
+            "url": "https://todoist-gpt-api.onrender.com"
+
+        }
+
+    ]
+
+)
 
 
 class TaskCreate(BaseModel):
