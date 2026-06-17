@@ -13,23 +13,22 @@ TODOIST_API_URL = "https://api.todoist.com/api/v1"
 app = FastAPI(
 
     title="Witek Todoist GPT API",
-
     servers=[
-
         {
-
             "url": "https://todoist-gpt-api.onrender.com"
-
         }
-
     ]
-
 )
 
 
 class TaskCreate(BaseModel):
     content: str
     project_id: str | None = None
+    due_string: str | None = None
+    priority: int | None = None
+
+class TaskUpdate(BaseModel):
+    content: str | None = None
     due_string: str | None = None
     priority: int | None = None
 
@@ -170,3 +169,25 @@ def close_task(task_id: str):
 @app.delete("/tasks/{task_id}")
 def delete_task(task_id: str):
     return todoist_delete(f"/tasks/{task_id}")
+
+
+@app.patch("/tasks/{task_id}")
+def update_task(task_id: str, task: TaskUpdate):
+    payload = {}
+
+    if task.content:
+        payload["content"] = task.content
+
+    if task.due_string:
+        payload["due_string"] = task.due_string
+
+    if task.priority:
+        payload["priority"] = task.priority
+
+    if not payload:
+        raise HTTPException(
+            status_code=400,
+            detail="No fields to update"
+        )
+
+    return todoist_post(f"/tasks/{task_id}", payload)
